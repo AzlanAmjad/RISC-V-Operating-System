@@ -124,3 +124,46 @@ void *memset(void *buf, char value, size_t space)
     return buf;
 }
 
+void *memcpy(void *dst, const void *src, size_t space)
+{
+    uint8_t *d = (uint8_t *)dst;
+    const uint8_t *s = (const uint8_t *)src;
+    while (space--)
+    {
+        *d++ = *s++;
+    }
+    return dst;
+}
+
+char *strcpy(char *dst, const char *src)
+{
+    char *d = dst;
+    // assume src is a NULL terminated string
+    while (*src)
+    {
+        *d++ = *src++;
+    }
+    // add NULL terminator
+    *d = '\0';
+    return dst;
+}
+
+int strcmp(const char *s1, const char *s2)
+{
+    /*
+        s1 == s2, return 0
+        s1 > s2, return positive
+        s1 < s2, return negative
+    */
+    while (*s1 && *s2)
+    {
+        if (*s1 != *s2)
+        {
+            break;
+        }
+        s1++;
+        s2++;
+    }
+
+    return *(unsigned char *)s1 - *(unsigned char *)s2;
+}

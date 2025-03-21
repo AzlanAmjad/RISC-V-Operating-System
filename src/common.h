@@ -22,7 +22,7 @@ typedef uint32_t paddr_t; // type for physical memory addresses
 typedef uint32_t vaddr_t; // type for virtual memory addresses
 
 void *memset(void *buf, char value, size_t space);
-void *memcopy(void *dst, const void *src, size_t space);
+void *memcpy(void *dst, const void *src, size_t space);
 char *strcpy(char *dst, const char *src);
 int strcmp(const char *s1, const char *s2);
 void printf(const char *fmt, ...);
