@@ -20,13 +20,17 @@ void printf(const char *fmt, ...)
             switch (*fmt)
             {
             case '\0':
+            {
                 // string ends print %
                 putchar('%');
                 goto end;
+            }
             case '%':
+            {
                 // double %
                 putchar('%');
                 break;
+            }
             case 's':
             {
                 // NULL terminated string
@@ -85,6 +89,8 @@ void printf(const char *fmt, ...)
                     8. value = 100, i = 0, nibble = 01100100 >> 0 * 4 & 1111 = 4
                     result in hex: 0x00000064 = 32-bit value 4 * 8 = 32-bit
                 */
+                putchar('0');
+                putchar('x');
                 for (int i = 7; i >= 0; i--)
                 {
                     unsigned nibble = (value >> (i * 4)) & 0xf;
