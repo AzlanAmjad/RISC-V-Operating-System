@@ -70,6 +70,14 @@ void yield(void)
     if (next == current_proc)
         return;
 
+    // store the address at the bottom of the proc stack in sscratch
+    // this is used by the exception handler if one occurs
+    __asm__ __volatile__(
+        "csrw sscratch, %[sscratch]\n"
+        :
+        : [sscratch] "r" ((uint32_t) &next->stack[sizeof(next->stack)])
+    );
+
     // Context switch
     struct process *prev = current_proc;
     current_proc = next;
@@ -152,7 +160,8 @@ kernel_entry(void)
 {
     __asm__ __volatile__(
         // save general purpose registers on stack
-        "csrw sscratch, sp\n"    // preserve current stack context
+        "csrrw sp, sscratch, sp\n" // Retrieve the kernel stack of the running process from sscratch
+
         "addi sp, sp, -4 * 31\n" // grow the stack, modify sp
 
         // insert current registers onto the stack
@@ -188,13 +197,16 @@ kernel_entry(void)
         "sw s10, 4 * 28(sp)\n"
         "sw s11, 4 * 29(sp)\n"
 
-        // store old sp at bottom of frame on stack
+        // store original sp at bottom of frame on stack
         "csrr a0, sscratch\n"
         "sw a0, 4 * 30(sp)\n"
 
+        // Reset the kernel stack.
+        "addi a0, sp, 4 * 31\n"
+        "csrw sscratch, a0\n"
+
         // store new sp in a0
         "mv a0, sp\n"
-
         // call trap handler
         "call handle_trap\n"
 
@@ -274,7 +286,7 @@ void proc_a_entry(void)
     while (1)
     {
         putchar('A');
-        switch_context(&proc_a->sp, &proc_b->sp);
+        yield();
         delay();
     }
 }
@@ -285,7 +297,7 @@ void proc_b_entry(void)
     while (1)
     {
         putchar('B');
-        switch_context(&proc_b->sp, &proc_a->sp);
+        yield();
         delay();
     }
 }
