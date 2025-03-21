@@ -2,6 +2,7 @@
 
 void putchar(char ch);
 
+/* DEBUGGING OPERATIONS */
 void printf(const char *fmt, ...)
 {
     /*
@@ -110,3 +111,16 @@ void printf(const char *fmt, ...)
 end:
     va_end(args);
 }
+
+/* MEMORY OPERATIONS */
+void *memset(void *buf, char value, size_t space)
+{
+    uint8_t *p = (uint8_t *)buf;
+    // set memory to value until space is filled
+    while (space--)
+    {
+        *p++ = value;
+    }
+    return buf;
+}
+

@@ -1,10 +1,6 @@
 #include "kernel.h"
 #include "common.h"
 
-typedef unsigned char uint8_t;
-typedef unsigned int uint32_t;
-typedef uint32_t size_t;
-
 extern char __bss[], __bss_end[], __stack_top[];
 
 // function to interact with the SBI
@@ -31,17 +27,6 @@ struct sbiret sbi_call(long arg0, long arg1, long arg2, long arg3, long arg4, lo
 void putchar(char ch)
 {
     sbi_call(ch, 0, 0, 0, 0, 0, 0, 1 /* OpenSBI Console Putchar function */);
-}
-
-void *memset(void *buf, char value, size_t space)
-{
-    uint8_t *p = (uint8_t *)buf;
-    // set memory to value until space is filled
-    while (space--)
-    {
-        *p++ = value;
-    }
-    return buf;
 }
 
 void main(void)
