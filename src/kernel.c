@@ -1,7 +1,24 @@
 #include "kernel.h"
 #include "common.h"
 
-extern char __bss[], __bss_end[], __stack_top[];
+extern char __bss[], __bss_end[], __stack_top[], __free_ram[], __free_ram_end[];
+
+// page (4KiB) allocator
+// TODO: maybe implement an algorithm that allows deallocation?
+paddr_t alloc_pages(uint32_t n)
+{
+    static paddr_t new_addr = (paddr_t) __free_ram;
+    paddr_t start_addr = new_addr;
+    
+    new_addr += n * PAGE_SIZE;
+    if (new_addr > (paddr_t) __free_ram_end)
+    {
+        PANIC("out of memory");
+    }
+
+    memset((void *) start_addr, 0, n * PAGE_SIZE);
+    return (paddr_t)start_addr;
+}
 
 // handle exception
 void handle_trap(struct trap_frame *f)
@@ -141,6 +158,12 @@ void main(void)
     WRITE_CSR(stvec, (uint32_t)kernel_entry);
     // test: trigger an illegal instruction exception
     // __asm__ __volatile__("unimp");
+
+    // test: memory allocation
+    paddr_t paddr0 = alloc_pages(2);
+    paddr_t paddr1 = alloc_pages(1);
+    printf("alloc_pages test: paddr0=%x\n", paddr0);
+    printf("alloc_pages test: paddr1=%x\n", paddr1);
 
     for (;;)
     {
