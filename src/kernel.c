@@ -287,7 +287,10 @@ void proc_a_entry(void)
     {
         putchar('A');
         yield();
-        delay();
+        for (int i = 0; i < 30; i++)
+        {
+            delay();
+        }
     }
 }
 
@@ -298,7 +301,10 @@ void proc_b_entry(void)
     {
         putchar('B');
         yield();
-        delay();
+        for (int i = 0; i < 30; i++)
+        {
+            delay();
+        }
     }
 }
 
@@ -313,7 +319,20 @@ void main(void)
 
     // set exception handler
     WRITE_CSR(stvec, (uint32_t)kernel_entry);
+    // test: trigger an illegal instruction exception
+    //__asm__ __volatile__("unimp");
+    // PANIC("testing kernel panic");
 
+    // test: memory allocation
+    
+    paddr_t paddr0 = alloc_pages(2);
+    paddr_t paddr1 = alloc_pages(1);
+    printf("alloc_pages test: paddr0=%x\n", paddr0);
+    printf("alloc_pages test: paddr1=%x\n", paddr1);
+    
+
+    // test: process creation and yield
+    
     idle_proc = create_process((uint32_t)NULL);
     idle_proc->pid = 0; // idle
     current_proc = idle_proc;
@@ -322,9 +341,22 @@ void main(void)
     proc_b = create_process((uint32_t)proc_b_entry);
 
     yield();
+    
+    for (;;);
     PANIC("switched to idle process");
 }
 
+
+/*
+COMPLETED SO FAR
+
+0. I got it to boot?
+1. Hello World / printf debugging / C standard library
+2. Kernel panic and Exception handling
+3. Page memory allocation $llvm-nm kernel.elf | grep __free_ram
+4. Process / process scheduling
+
+*/
 __attribute__((section(".text.boot")))
 __attribute__((naked)) void
 _start(void)
