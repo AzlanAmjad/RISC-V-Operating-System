@@ -1,3 +1,4 @@
+OUTPUT_ARCH(riscv)
 ENTRY(_start)
 
 SECTIONS {
@@ -17,12 +18,12 @@ SECTIONS {
     }
 
     .bss : ALIGN(4) {
-        __bss == .;
+        __bss = .;
         *(.bss .bss.* .sbss .sbss.*);
         __bss_end = .;
     }
 
     . = ALIGN(4);
-    . += 128 * 1024 /* 128KiB */
+    . += 128 * 1024; /* 128KiB */
     __stack_top = .;
 }
